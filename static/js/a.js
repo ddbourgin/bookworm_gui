@@ -958,11 +958,16 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
           while (_k < _len3) {
 	    var tst = dataArray[_k].toString();
 	    var link = reg2.exec(tst);
+	    reg2.lastIndex = 0;
 
 	    tst = tst.split(link)[0];
+	    if (!link) {
+		link = '';
+	    }
 	    tst = tst.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
 	    tst = tst.replace(reg, function(str) {return '<font color="red">'+str+'</font>'});
 	    tst = tst + link;
+
             bookLinks.push("<li>" + tst + "</li>");
             _k++;
           }
