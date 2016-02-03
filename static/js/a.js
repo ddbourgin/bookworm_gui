@@ -967,7 +967,6 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	    tst = tst.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
 	    tst = tst.replace(reg, function(str) {return '<font color="red">'+str+'</font>'});
 	    tst = tst + link;
-
             bookLinks.push("<li>" + tst + "</li>");
             _k++;
           }
