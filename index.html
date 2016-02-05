@@ -1,0 +1,233 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="common/css/pagination.css" />
+    <link rel="stylesheet" href="common/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="common/js/chosen/chosen.css" />
+    <link rel="stylesheet" href="common/css/jquery-ui-1.8.16.custom.css"/>
+    
+    <script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    <script src="common/js/jquery.min.js"></script>
+    <script src="common/js/jquery-ui.min.js"></script>
+    <script src="common/js/jquery.feedback.js" type="text/javascript"></script>
+    <script src="common/js/jquery.multiselect.min.js" type="text/javascript"></script>
+    <script src="common/js/jquery.pagination.js" type="text/javascript"></script>
+    <script src="common/js/keymaster.min.js" type="text/javascript"></script>
+    <script src="common/highcharts/js/highcharts.js" type="text/javascript"></script>
+    <script src="common/highcharts/js/modules/exporting.js"></script>
+    <script src="common/highcharts/js/modules/export-csv.js"></script>
+    <script src="common/js/underscore.js" type="text/javascript"></script>
+    <script src="common/js/urlEncode.js" type="text/javascript"></script>
+    <script src="common/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+    <script src="common/js/chosen/chosen.jquery.js" type="text/javascript"></script>
+    <link rel="stylesheet/less" href="common/css/s.less" />
+    <script src="common/js/less-1.3.0.min.js" type="text/javascript"></script>
+    <script src="https://apis.google.com/js/client.js?onload=googleApiLoaded"></script>
+    <script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>    
+    <script type="text/javascript" src="common/js/twitter_google_links.js"></script>
+    <script type="text/javascript" src="static/js/a.js"></script>
+    <link rel="stylesheet" href="common/css/misc.css"/>
+    <meta charset="UTF-8">
+    <meta name="description" content="dev">
+    <title>dev</title>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-65839510-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+</head>
+
+<body>
+
+    <div class="row-fluid">
+
+        <div id="header">
+
+            <div id="header_brand">
+                <h1><a href="">Transcript Browser: </a><font id="sourceName1"></font></h1>
+                    <span class="subtitle">Development Version</span> 
+            </div>
+
+            <div id="header_right">
+                <a href="javascript:void(0)" class="permalink"><img border="0" src="common/images/link1.png" width="40" class="permalink-img"></a>
+                <a href="#" class="advanced"><img border="0" src="common/images/gear.png" width="40" class="advanced-img"></a>
+                <a href="#" class="about"><img border="0" class="about-img" src="common/images/info.png" width="40"></a> 
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+    <div id="search_queries">
+
+        <table class="top">
+            <tr class="top">
+            </tr>
+        </table>
+        <div id="search_error">
+        </div>
+
+    </div>
+
+    <div id="main">
+        <div id="container">
+
+            <div id="chart_wrapper">
+                <div id="chart">
+                </div>
+            </div>
+
+
+        <div style="display:none">
+            <div id="booksz">
+                <div id="pagination"></div>
+                <br style="clear:both"/><hr />
+                <div id="bookdivtitle"></div>
+                <div id="bookdiv">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="books" style="display:none">
+
+        <!-- The 2 MathJax elements for testing -->
+      <!--<script id=mjconfig></script>
+      <script id=mjsource></script> -->
+
+      <div class="modal-header">
+        <a class="close" data-discuss="modal">×</a>
+        <h4 class="books-title">Foo</h4>
+      </div>
+
+      <div class="modal-body">
+        <div class="book-list">
+        </div>
+      </div>
+
+    </div>
+
+    <span id="category_box_template" class="box category_box_template">
+        <table>
+            <tr class="category_box_row">
+                <td class="category_box_data">
+                    <a href="javascript:void(0)" class="box_data">
+                        <span class="box_value">All metadata</span>
+                    </a>
+                </td>
+
+                <td class="category_box_x">
+                    <a class="box_x" href="javascript:void(0)">
+                        <span class="removequery">
+                            <i class="fa fa-minus fa-1">
+                            </i>
+                        </span>
+                    </a>
+                </td>
+
+
+                <td>
+                    <a class="box_plus" href="javascript:void(0)" alt="Add">
+                        <span class="addquery">
+                            <i class="fa fa-plus fa-1">
+                            </i>
+                        </span>
+                    </a>
+                </td>
+
+            </tr>
+
+        </table>
+    </span>
+
+    <div id="settings" style="display: none">
+        <table>
+            <tr><td><div id="labeltime"></div></td><td><div id="timetype"></div></td></tr>
+<!--            <tr><td><label for="yeartype">Time:</label></td>
+                <td width="175px"><div id="year-slider"></div> </td></tr> 
+                <tr><td></td><td width="210px"><p id="time-val" style="width: 210px"></p></td></tr> -->
+                <tr><td>
+                    <label for="counttype">Metric:</label></td>
+                    <td>
+                        <div class="btn-group" data-toggle="buttons-radio" id="counttype">
+                            <button class="btn btn-mini" data-val="WordsPerMillion" data-label="Words per Million">% of words</button>
+                        <!--    <button class="btn btn-mini" data-val="TextPercent" data-label="% of Texts"><div id="countName1"></div></button> -->
+                            <button class="btn btn-mini" data-val="WordCount" data-label="Number of Words">word count</button>
+                        <!--    <button class="btn btn-mini" data-val="TextCount" data-label="Number of Texts"><div id="countName2"></div></button> -->
+                        </div>
+                    </td>
+                </tr>
+                <tr><td>
+                    <label for="collationtype">Case:</label></td>
+                    <td width="375px">
+                        <div class="btn-group" data-toggle="buttons-radio" id="collationtype">
+                            <button class="btn btn-mini" data-val="Case_Sensitive">Sensitive</button>
+                            <button class="btn btn-mini" data-val="Case_Insensitive">Insensitive</button>
+                        </div>
+                    </td>
+                </tr>
+
+		<tr><td>
+			<label for="word_phoneme_toggle">Search By:</label></td>
+			<td width="375px">
+				<div class="btn-group" data-toggle="buttons-radio" id="word_phoneme_toggle">
+					<button class="btn btn-mini" data-val="Words">Words</button>
+					<button class="btn btn-mini" data-val="Phonemes">Phonemes</button>
+				</div>
+			</td>
+		</tr>
+
+                <tr><td><label for="smoothing">Smoothing:</label></td>
+                    <td width=175px style="vertical-align:left">
+                        <table class="smoothing">
+                            <tr>
+                                <td>
+                                    <div id="smoothing-slider" width="175px"></div>
+                                </td><td>
+                                <p id="smoothing-val">t</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div id="about" style="display: none; width: 450px;"> 
+        <p style="font-size:12px";><b>About</b><br>The current browser allows you to search for trends within the transcripts of the nationally syndicated radio show <a href="http://www.thisamericanlife.org/" target="_blank">This American Life</a>. It was built using <a href="https://github.com/Bookworm-project" target="_blank">Bookworm</a> with transcripts collected from the This American Life <a href="http://www.thisamericanlife.org/radio-archives" target="_blank">radio archives</a>.<p><p style="font-size:12px";><b>Operation</b><br>The browser supports displaying multiple trends on the same plot. To add a new trend line to the current plot, click the green "<font color="green">+</font>" symbol to the right of the search box. For now, the maximum query length is 3 words.<p><p style="font-size:12px";>You can adjust the display parameters for the plot by clicking on the gear icon at the upper right hand corner of the page.<br><ul class="list-group"><li style="font-size:12px";>The <code style="font-size:10px";>Time</code> field controls the variable displayed on the horizontal axis of the chart -- you can plot the results as a function of the episode number, the episode year, or the within-episode timestamp in minutes.</li><li style="font-size:12px";>The <code style="font-size:10px";>Metric</code> field allows you to select whether the results are displayed in terms of the raw number of occurences of the search query within the corpus (word count; unnormalized) or in terms of the ratio of the number of query occurrences to the total number of terms in the corpus (% of words; normalized).</li><li style="font-size:12px";>The <code style="font-size:10px";>Case</code> field determines whether or not the search is case-sensitive.</li><li style="font-size:12px";>The <code style="font-size:10px";>Smoothing</code> slider allows you to choose the number of adjacent datapoints to average over when displaying the search results. Larger values of this parameter result in smoother trendlines, but run the risk of obscuring local variation in the data.</li></ul><p><p style="font-size:12px";><b>Notes</b><br>Be aware that the viewer is still a bit buggy! In particular, it may sometimes require re-running a particular query in order to ensure that a recent change in search parameters is fully reflected in the results. It has also been observed that punctuation (in particular, apostrophes when used in contractions) cause the viewer to break :-(<p>
+    </div>
+
+    <div id="permalink" style="display:none;">
+        <table>
+            <tr>
+                <td>
+                    <label>Share this search:</label>
+                </td>
+                <td>
+                    <input type="text"></input>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("[rel=tooltip]").tooltip({ placement: 'right'});
+        });
+    </script>
+</body>
+</html>
