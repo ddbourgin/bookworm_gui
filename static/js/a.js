@@ -37,6 +37,24 @@
       },
       error:function(exception){console.log('Exception:'+exception);}
     });
+
+
+    var entityMap = {
+       "&": "&amp;",
+       "<": "&lt;",
+       ">": "&gt;",
+       '"': '&quot;',
+       "'": '&#39;',
+       "/": '&#x2F;'
+      };
+
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"'\/]/g, function (s) {
+           return entityMap[s];
+        });
+    }
+
+
     getHash = function() {
 
       var translateOldCounttypes = function(term) {
@@ -927,6 +945,8 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
         runQuery();
       }
     });
+
+
     showBooks = function(event) {
       var name, query, title, sens, terms;
       name = this.name;
@@ -990,9 +1010,12 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	           tst = tst.replace(reg3, function(str) {return '<font color="red">'+str+'</font>'});
 		}
 	    }
-
-	    tst = tst + link;
-            bookLinks.push("<li>" + tst + "</li>");
+	    var st1 = escapeHtml(dataArray[_k].toString())
+	    var params = {sstring: st1, li_id: _k, db: dbname}
+	    var orig = escapeHtml(tst + link);
+	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'"href="#">Toggle</a>'
+	    tst = tst + link + toggle_link; 
+            bookLinks.push("<li id="+_k.toString()+">" + tst + "</li>");
             _k++;
           }
           $(".book-list").html("<ol></ol>");
@@ -1007,66 +1030,66 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
             }
           }
           $("#books").modal("show");
+
+	  function toggleLine(e, me) {
+            var curstring = me.data('sentence');
+	    var li_id = me.data('line');
+	    var database = me.data('db');
+	    var orig = me.data('orig');
+	    var old = me.data('old');
+	    if (old) {
+	      console.log(old);
+	      updateLine(old, li_id, NaN);
+	    } else {
+              var phones = false;
+              if (curstring.indexOf('{sp}') != -1) {
+                phones = true;
+              }
+              query = {sstring: curstring, phonemes: phones, db: database};
+
+              $.ajax({
+                  url: "/cgi-bin/toggle_query.py",
+                  data: { query: JSON.stringify(query)},
+                  dataType: "html",
+                  success: function(response) {
+		      updateLine(response, li_id, orig);
+                  }
+              });
+	    }
+          return false;
+  	  };
+
+  	  function updateLine(response, li_id, orig) {
+	    var old;
+	    var result = response.replace(/.*RESULT===/,"");
+	    var _k = li_id;
+	    if (orig) {
+	      old = orig;
+	    } else {
+	      old = $("li#" + _k.toString()).text().replace(" Toggle", "").replace("\n", "");
+	    }
+	    st1 = escapeHtml(result);
+	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-old="' + escapeHtml(old) + '" href="#">Toggle</a>';
+	    result = result + toggle_link; 
+	    var line = "<li id="+_k.toString()+">" + result + "</li>";
+	    $("li#" + _k.toString() ).replaceWith(line);
+	    $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
+	  };
+
+	  $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
+
           n_pages = Math.ceil(bookLinks.length / 1000.0);
           page = 1;
-// PAGINATION CODE
-//	  n_pages = 1;
-//          $(".pagination ol").html("");
-//          $(".pagination ol").append("<li><a href=\"#\">«</a></li>");
-//          i = 1;
-//          while (i <= n_pages) {
-//            $(".pagination ol").append("<li><a href=\"#\">" + i + "</a></li>");
-//            i++;
-//          }
-//          $(".pagination ol").append("<li><a href=\"#\">»</a></li>");
           $(".active", "#books").removeClass("active");
           $(".disabled", "#books").removeClass("disabled");
           $("a:contains(«)", "#books").parent("li").addClass("disabled");
-// PAGINATION CODE
-//          $(".pagination a", "#books").filter(function(i, v) {
-//            return i === page;
-//          }).parent("li").addClass("active");
         },
         error:function(exception){console.log('Exception:'+exception);}
       });
     };
     page = 0;
     n_pages = 0;
-// PAGINATION CODE
- //   $("#books").on("click", ".pagination a", function(event) {
- //     var i, v;
- //     v = $(this).html();
- //     if (v === "«") {
- //       if (page <= 1) {
- //         return false;
- //       }
- //       page--;
- //     } else if (v === "»") {
- //       if (page >= n_pages) {
- //         return false;
- //       }
- //       page++;
-//      } else {
-//        page = parseInt(v);
-//      }
-//      $(".book-list").html("<table></table>");
- //     i = (page - 1) * 1000;
- //     while (i < Math.min(page * 1000, bookLinks.length)) {
- //       $(".book-list table").append(bookLinks[i]);
- //       i++;
- //     }
-//      $(".active", "#books").removeClass("active");
-//      $(".disabled", "#books").removeClass("disabled");
-//      if (page === 1) {
-//        $("a:contains(«)", "#books").parent("li").addClass("disabled");
-//      }
-//      if (page === n_pages) {
-//        $("a:contains(»)", "#books").parent("li").addClass("disabled");
-//      }
-//      $(".pagination a", "#books").filter(function(i, v) {
-//        return i === page;
-//      }).parent("li").addClass("active");
-//    });
+
     $("#books").on("click", ".close", function(event) {
       $("#books").modal("hide");
     });
@@ -1197,6 +1220,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
   });
 
 }).call(this);
+
 
 var smooth = function(data,span) {
     //This could be modified to take a kernel or something.
