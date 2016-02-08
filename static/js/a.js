@@ -1013,7 +1013,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	    var st1 = escapeHtml(dataArray[_k].toString())
 	    var params = {sstring: st1, li_id: _k, db: dbname}
 	    var orig = escapeHtml(tst + link);
-	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'"href="#">Toggle</a>'
+	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>'
 	    tst = tst + link + toggle_link; 
             bookLinks.push("<li id="+_k.toString()+">" + tst + "</li>");
             _k++;
@@ -1069,7 +1069,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	      old = $("li#"+ _k.toString()).html().split(' <a class="wp_toggle"')[0];
 	    }
 	    st1 = escapeHtml(result);
-	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-old="' + escapeHtml(old) + '" href="#">Toggle</a>';
+	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-old="' + escapeHtml(old) + '" style="color:blue;text-decoration:underline;cursor:pointer" ref="#">Toggle</a>';
 	    result = result.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
 	    result = result + toggle_link; 
 	
