@@ -1066,11 +1066,13 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	    if (orig) {
 	      old = orig;
 	    } else {
-	      old = $("li#" + _k.toString()).text().replace(" Toggle", "").replace("\n", "");
+	      old = $("li#"+ _k.toString()).html().split(' <a class="wp_toggle"')[0];
 	    }
 	    st1 = escapeHtml(result);
 	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-old="' + escapeHtml(old) + '" href="#">Toggle</a>';
+	    result = result.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
 	    result = result + toggle_link; 
+	
 	    var line = "<li id="+_k.toString()+">" + result + "</li>";
 	    $("li#" + _k.toString() ).replaceWith(line);
 	    $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
