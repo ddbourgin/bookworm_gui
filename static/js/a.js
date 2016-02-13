@@ -623,7 +623,8 @@
 	  var slugQuery;
 	  matches = '[' + response.split('] [')[1];
 	  response = response.split('] [')[0] + ']';
-	  matches = JSON.parse(matches.replace(/'/g, '"'))
+	  console.log(matches.replace(/\'\B|\B\'/g, '"'))
+	  matches = JSON.parse(matches.replace(/\'\B|\B\'/g, '"'))
           data = JSON.parse(response.replace(/.*RESULT===/,""))
 
 	  if (regex) {
@@ -974,7 +975,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
           var sstring = this.custom.sstring;
 	  var reg = new RegExp('\\b'+sstring+'\\b', this.custom.sens); 
 	  var reg1 = new RegExp('{([0-9].[0-9]{2}|sp)}', this.custom.sens); 
-	  var reg2 = new RegExp('\\[<a href=.*\\]', this.custom.sens);
+	  var reg2 = new RegExp('\\[<a href=.*', this.custom.sens);
 
 	  cat_link = void 0;
           dataArray = void 0;
@@ -994,7 +995,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
           _len3 = dataArray.length;
           while (_k < _len3) {
 	    var tst = dataArray[_k].toString();
-	    var link = reg2.exec(tst);
+	    var link = reg2.exec(tst)[0];
 	    reg2.lastIndex = 0;
 
 	    tst = tst.split(link)[0];
@@ -1013,8 +1014,13 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	    var st1 = escapeHtml(dataArray[_k].toString())
 	    var params = {sstring: st1, li_id: _k, db: dbname}
 	    var orig = escapeHtml(tst + link);
-	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>'
-	    tst = tst + link + toggle_link; 
+
+	    var toggle = link.split('data-alt=');
+	    var toggle_link = toggle[0] +' data-orig="' + orig + '" data-db="' + dbname + '" data-line="' + _k.toString() + '" data-toggled="False" data-alt=' + toggle[1]	    
+//	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>'
+
+	    tst = tst + toggle_link;
+//	    tst = tst + link + toggle_link; 
             bookLinks.push("<li id="+_k.toString()+">" + tst + "</li>");
             _k++;
           }
@@ -1032,34 +1038,36 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
           $("#books").modal("show");
 
 	  function toggleLine(e, me) {
-            var curstring = me.data('sentence');
+//            var curstring = me.data('sentence');
 	    var li_id = me.data('line');
 	    var database = me.data('db');
 	    var orig = me.data('orig');
-	    var old = me.data('old');
-	    if (old) {
-	      console.log(old);
-	      updateLine(old, li_id, NaN);
-	    } else {
-              var phones = false;
-              if (curstring.indexOf('{sp}') != -1) {
-                phones = true;
-              }
-              query = {sstring: curstring, phonemes: phones, db: database};
+	    var toggled = me.data('toggled');
+	    var alt = me.data('alt');
 
-              $.ajax({
-                  url: "/cgi-bin/toggle_query.py",
-                  data: { query: JSON.stringify(query)},
-                  dataType: "html",
-                  success: function(response) {
-		      updateLine(response, li_id, orig);
-                  }
-              });
+	    if (toggled === 'False') {
+	      result = alt.split(' <a class="wp_toggle"')[0]	      
+  	      result = result.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
+	      toggle_line = ' <a class="wp_toggle" data-orig="' + escapeHtml(orig.split(' <a class="wp_toggle"')[0]) + '" data-alt="' + escapeHtml(alt) + '" data-db="'+ dbname +'" data-line="'+ li_id + '" data-toggled="True" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>';
+	      result = result + toggle_line; 
+	      var line = '<li id="'+li_id.toString()+'">' + result + '</li>';
+	      console.log(_k);
+	      $("li#" + li_id.toString() ).replaceWith(line);
+	      $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
+
+	    } else {
+	      result = orig.split(' <a class="wp_toggle"')[0];
+  	      result = result.replace(reg1, function(str) {return '<font color="green">'+str+'</font>'});
+	      toggle_line = ' <a class="wp_toggle" data-orig="' + escapeHtml(orig.split(' <a class="wp_toggle"')[0]) + '" data-alt="' + escapeHtml(alt) + '" data-db="'+ dbname +'" data-line="'+ li_id + '" data-toggled="False" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>';
+	      result = result + toggle_line; 
+	      var line = "<li id="+li_id.toString()+">" + result + "</li>";
+	      $("li#" + li_id.toString() ).replaceWith(line);
+	      $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
 	    }
           return false;
   	  };
 
-  	  function updateLine(response, li_id, orig) {
+  	  function updateLine(tog, li_id, orig) {
 	    var old;
 	    var result = response.replace(/.*RESULT===/,"");
 	    var _k = li_id;
