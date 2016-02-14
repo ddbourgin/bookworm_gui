@@ -1016,7 +1016,11 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	    var orig = escapeHtml(tst + link);
 
 	    var toggle = link.split('data-alt=');
-	    var toggle_link = toggle[0] +' data-orig="' + orig + '" data-db="' + dbname + '" data-line="' + _k.toString() + '" data-toggled="False" data-alt=' + toggle[1]	    
+	    if (toggle.length === 2) {
+	      var toggle_link = toggle[0] +' data-orig="' + orig + '" data-db="' + dbname + '" data-line="' + _k.toString() + '" data-toggled="False" data-alt=' + toggle[1];
+	    } else {
+	      var toggle_link = link;
+	    }
 //	    toggle_link = ' <a class="wp_toggle" data-sentence="'+ st1 + '" data-line="' + _k.toString() + '" data-db="' + dbname + '" data-orig="'+ orig +'" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>'
 
 	    tst = tst + toggle_link;
@@ -1051,7 +1055,7 @@ var smoothingSpan = getSmoothing($("#smoothing-slider").slider("value"))
 	      toggle_line = ' <a class="wp_toggle" data-orig="' + escapeHtml(orig.split(' <a class="wp_toggle"')[0]) + '" data-alt="' + escapeHtml(alt) + '" data-db="'+ dbname +'" data-line="'+ li_id + '" data-toggled="True" style="color:blue;text-decoration:underline;cursor:pointer" href="#">Toggle</a>';
 	      result = result + toggle_line; 
 	      var line = '<li id="'+li_id.toString()+'">' + result + '</li>';
-	      console.log(_k);
+
 	      $("li#" + li_id.toString() ).replaceWith(line);
 	      $(".wp_toggle").click( function(e) {var me = $(this); toggleLine(e, me); });
 
