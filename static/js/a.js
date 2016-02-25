@@ -491,9 +491,11 @@
                 return $(this).find("td").css("background-color", "rgba(" + colors[i + 1] + ",1)");
             });
         };
+
         $(document).on("click", "#blah", function(event) {
             runQuery();
         });
+
         buildQuery = function() {
             var cat, cats, i, key, limit, limits, query, terms, time_measure, time_limits;
             time_measure = void 0;
@@ -586,103 +588,6 @@
             return query;
         };
 
-
-        buildQuery_csv = function() {
-            var cat, cats, i, key, limit, limits, query, terms, time_measure, time_limits;
-            time_measure = void 0;
-            if (time_array.length === 1) {
-                time_measure = time_array[0]["dbfield"];
-            } else {
-                if (time_array.length > 1) {
-                    time_measure = $("#time_measure").val();
-                }
-            }
-
-            if ($(".active", "#word_phoneme_toggle").data("val") === "Words") {
-                dbname = options["settings"]["dbname"];
-            } else if ($(".active", "#word_phoneme_toggle").data("val") === "Phonemes") {
-                dbname = options["settings"]["dbname"] + '_phonemes';
-            }
-
-            query = {
-                groups: [time_measure],
-                counttype: $(".active", "#counttype").data("val"),
-                words_collation: $(".active", "#collationtype").data("val"),
-                database: dbname
-            };
-
-            limits = [];
-            terms = [];
-            regex = false;
-            $("input.term").each(function(i, v) {
-                terms.push($(v).val());
-                for (i = 0; i < regChar.length; i++) {
-                    if ($(v).val().indexOf(regChar[i]) != -1) {
-                        regex = true;
-                    }
-                }
-            });
-            cats = [];
-            $(".search-row").each(function(i, v) {
-                var edit_box, row, subcats;
-                row = $(v).data("row");
-                edit_box = _.find($(".edit-box"), function(el) {
-                    return $(el).data("row") === row;
-                });
-                subcats = {};
-                $(edit_box).find("tr.datarow").each(function(i2, v2) {
-                    var singlecats;
-                    singlecats = [];
-                    $(v2).find("option:selected").each(function(i3, v3) {
-                        singlecats.push($(v3).val());
-                    });
-                    subcats[$(v2).data("name")] = singlecats;
-                });
-                cats.push(subcats);
-            });
-
-            if (typeof query.groups[0] === 'undefined') {
-                params = getHash();
-                time_limits = _(options["ui_components"]).filter(function(v) {
-                    return v["name"] === params["time_measure"];
-                });
-                time_limits = time_limits[0]["range"];
-            } else {
-                time_limits = _(options["ui_components"]).filter(function(v) {
-                    return v["dbfield"] === query.groups[0];
-                });
-                time_limits = time_limits[0]["range"];
-            }
-
-            i = 0;
-            while (i < terms.length) {
-                limit = {
-                    word: [terms[i]]
-                };
-                //  time_limits = $("#year-slider").slider("values")
-                //  time_limits = time_range;
-                limit[time_measure] = {
-                    "$gte": time_limits[0],
-                    "$lte": time_limits[1]
-                }
-                cat = cats[i];
-                for (key in cat) {
-                    if (cat[key].length !== 0) {
-                        limit[key] = cat[key];
-                    }
-                }
-                limits.push(limit);
-                i++;
-            }
-            query["search_limits"] = limits;
-            query["method"] = "return_tsv"
-            return query;
-        };
-
-
-
-
-
         addCommas = function(str) {
             var amount, i, output;
             amount = new String(str);
@@ -714,6 +619,7 @@
                 return false;
             }
             query = buildQuery();
+            // console.log(query);
             $("#permalink").find("input").val(permQuery());
             $("#chart").html("");
             $("#chart").addClass("loading");
@@ -729,6 +635,7 @@
                     console.log(matches.replace(/\'\B|\B\'/g, '"'))
                     matches = JSON.parse(matches.replace(/\'\B|\B\'/g, '"'))
                     data = JSON.parse(response.replace(/.*RESULT===/, ""))
+                    // console.log(data);
                     if (regex) {
                         console.log(matches);
                     }
@@ -1261,21 +1168,56 @@
             return link;
         };
 
+        function JSON2CSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var head = array[0];
+            var str = '';
+            var line = '';
+
+            str += query.groups[0] + ','
+            for (var index in array[0]) {
+                line += index + ',';
+            }
+            line = line.slice(0, -1);
+            str += line + '\r\n';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                line += query.search_limits[i].word + ',';
+                for (var index in array[i]) {
+                    line += array[i][index] + ',';
+                }
+                line = line.slice(0, -1);
+                str += line + '\r\n';
+            }
+            return str;
+        }
+
         $(".download").click(function(event) {
             var query;
-            query = buildQuery_csv();
+            query = buildQuery();
             $.ajax({
                 url: "/cgi-bin/dbbindings.py",
                 data: {query: JSON.stringify(query) },
                 success: function(response) {
-                    window.open('../download/bookworm-data.txt');
-                    console.log(response);
+                    response = response.split('] [')[0] + ']';
+                    var data = JSON.parse(response.replace(/.*RESULT===/, ""))
+                    window.URL = window.URL || window.webkitURL;
+                    var csv = JSON2CSV(data);
+                    var csvBlob = new Blob([csv]);
+                    var csvURL = window.URL.createObjectURL(csvBlob);
+                    var link = document.createElement('a');
+                    link.href = csvURL;
+                    link.download = 'bookwork-data.csv';
+                    document.body.appendChild(link);
+                    link.click();
                 },
                 error: function(exception) {
                     console.log('Exception:' + exception);
                 }
             });
         });
+
         $(".permalink").click(function(event) {
             var hidePermalink, inSettings;
             inSettings = function(evt) {
